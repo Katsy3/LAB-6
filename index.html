@@ -1,53 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
-
-  <head>
-    <meta charset="UTF-8">
-    <title>Untitled</title>
-    <link rel="stylesheet" href="./style.css">
-
-  </head>
-    
-  <body>
-  <!DOCTYPE html>
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Лабораторна робота №2 - Інформація про студента</title>
-  <link rel="stylesheet" href="lab2.css"> <!-- Підключення CSS, якщо є -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Лаба: 5 DOM-завдань</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Інформація про студента</h1>
+  <div class="container">
+    <h1>Лабораторна: Робота з DOM</h1>
 
-  <!-- Блок для основної інформації -->
-  <div class="block" id="info">
-    <h3>Основна інформація</h3>
-    <p id="basicInfo"></p>
+    <!-- 1. To-Do -->
+    <section id="todo">
+      <h2>Завдання 1: To-Do List</h2>
+      <div class="input-group">
+        <input type="text" id="todoInput" placeholder="Додати задачу...">
+        <button id="addBtn">Додати</button>
+      </div>
+      <div class="filters">
+        <button data-filter="all" class="active">Всі</button>
+        <button data-filter="active">Активні</button>
+        <button data-filter="done">Виконані</button>
+        <button id="clearDone">Очистити</button>
+      </div>
+      <p>Активних: <strong id="todoCount">0</strong></p>
+      <ul id="todoList"></ul>
+    </section>
+
+    <!-- 2. Галерея -->
+    <section id="gallery">
+      <h2>Завдання 2: Галерея</h2>
+      <div class="gallery" id="galleryThumbs"></div>
+      <div class="modal" id="modal">
+        <span class="close">X</span>
+        <span class="nav prev">Previous</span>
+        <span class="nav next">Next</span>
+        <img id="modalImg" src="" alt="">
+        <div class="caption" id="modalCaption"></div>
+      </div>
+    </section>
+
+    <!-- 3. Форми -->
+    <section id="formBuilder">
+      <h2>Завдання 3: Конструктор форм</h2>
+      <div class="input-group">
+        <select id="fieldType">
+          <option value="text">Текст</option>
+          <option value="email">Email</option>
+          <option value="number">Число</option>
+          <option value="checkbox">Чекбокс</option>
+          <option value="select">Список</option>
+        </select>
+        <input type="text" id="fieldLabel" placeholder="Назва поля">
+        <button id="addFieldBtn">Додати</button>
+      </div>
+      <button id="exportJson">Експорт JSON</button>
+      <div id="fieldsList"></div>
+    </section>
+
+    <!-- 4. Таблиця -->
+    <section id="table">
+      <h2>Завдання 4: Таблиця</h2>
+      <div class="controls">
+        <button id="addRowBtn">+ Рядок</button>
+        <button id="exportCsv">Експорт CSV</button>
+        <input type="text" id="filterInput" placeholder="Фільтр...">
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th data-col="0">Ім'я</th>
+            <th data-col="1">Вік</th>
+            <th data-col="2">Місто</th>
+            <th>Дія</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="pagination" id="pagination"></div>
+    </section>
+
+    <!-- 5. Dropdown -->
+    <section id="dropdown">
+      <h2>Завдання 5: Dropdown</h2>
+      <div class="dropdown">
+        <button class="dropbtn" id="dropBtn" aria-haspopup="true" aria-expanded="false">
+          Оберіть країну Down Arrow
+        </button>
+        <div class="dropdown-menu" id="dropdownMenu" role="listbox"></div>
+      </div>
+      <p>Обрано: <strong id="selectedCountry">—</strong></p>
+    </section>
   </div>
 
-  <!-- Блок для оцінок -->
-  <div class="block" id="grades">
-    <h3>Оцінки</h3>
-    <p id="gradesInfo"></p>
-  </div>
-
-  <!-- Блок для категорії студента -->
-  <div class="block" id="category">
-    <h3>Категорія студента</h3>
-    <p id="categoryInfo"></p>
-  </div>
-
-  <!-- Блок для вікової категорії -->
-  <div class="block" id="ageCategory">
-    <h3>Вікова категорія</h3>
-    <p id="ageCategoryInfo"></p>
-  </div>
-
-  <script src="lab2.js"></script> <!-- Підключення вашого JavaScript -->
+  <script src="script.js"></script>
 </body>
-</html>
-    <script  src="./script.js"></script>
-
-  </body>
-  
 </html>
