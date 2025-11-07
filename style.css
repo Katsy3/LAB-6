@@ -1,0 +1,65 @@
+/* Основні стилі для тіла сторінки */
+body {
+  font-family: "Times New Roman", serif;
+  background-color: #FFFFFF; /* Білий фон */
+  margin: 20px;
+  line-height: 1.6;
+  color: #000000; /* Чорний текст */
+}
+
+/* Стилі для заголовка */
+h1 {
+  color: #000000; /* Чорний заголовок */
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.8em;
+  padding: 10px;
+  border-bottom: 2px solid #000000; /* Чорна межа знизу */
+}
+
+/* Стилі для блоків */
+.block {
+  border: 1px solid #000000; /* Чорна рамка */
+  padding: 15px;
+  margin: 10px 0;
+  background-color: #FFFFFF; /* Білий фон блоків */
+  border-radius: 5px; /* Заокруглення кутів */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Чорна тінь */
+}
+
+/* Стилі для підзаголовків усередині блоків */
+.block h3 {
+  margin-top: 0;
+  color: #000000; /* Чорний текст для підзаголовків */
+  font-size: 1.2em;
+}
+
+/* Стилі для міток (span) */
+span {
+  font-weight: bold;
+  color: #000000; /* Чорний колір для міток */
+}
+
+/* Стилі для абзаців усередині блоків */
+.block p {
+  margin: 5px 0;
+  color: #000000; /* Чорний текст всередині абзаців */
+}
+
+/* Адаптивність для малих екранів */
+@media (max-width: 600px) {
+  body {
+    margin: 10px;
+  }
+  .block {
+    padding: 10px;
+    margin: 5px 0;
+  }
+  h1 {
+    font-size: 1.5em;
+    padding: 8px;
+  }
+  .block h3 {
+    font-size: 1.1em;
+  }
+}
