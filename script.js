@@ -1,165 +1,383 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: 'Segoe UI', Tahoma, sans-serif;
-  background: #f0f2f5;
-  color: #1a1a1a;
-  line-height: 1.6;
-}
-.container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
-h2 { color: #2980b9; border-bottom: 3px solid #3498db; padding-bottom: 8px; margin-bottom: 15px; }
+// === 1. To-Do ===
+const Todo = {
+  tasks: [],
+  filter: 'all',
 
-section {
-  background: white;
-  padding: 25px;
-  margin: 25px 0;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-}
+  init() {
+    document.getElementById('addBtn').onclick = () => this.add();
+    document.querySelectorAll('.filters button[data-filter]').forEach(btn => {
+      btn.onclick = () => this.setFilter(btn.dataset.filter);
+    });
+    document.getElementById('clearDone').onclick = () => this.clearDone();
+    document.getElementById('todoInput').addEventListener('keypress', e => {
+      if (e.key === 'Enter') this.add();
+    });
+    this.render();
+  },
 
-/* Кнопки */
-button {
-  padding: 10px 16px;
-  margin: 5px;
-  border: none;
-  border-radius: 6px;
-  background: #3498db;
-  color: white;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-button:hover { background: #2980b9; transform: translateY(-1px); }
-button:active { transform: translateY(0); }
+  add() {
+    const input = document.getElementById('todoInput');
+    const text = input.value.trim();
+    if (!text) return;
+    this.tasks.push({ id: Date.now(), text, done: false });
+    input.value = '';
+    this.render();
+  },
 
-/* Поля */
-.input-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
-input, select {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 1em;
-}
-input:focus, select:focus { outline: 2px solid #3498db; }
+  toggle(id) {
+    this.tasks = this.tasks.map(t => t.id === id ? { ...t, done: !t.done } : t);
+    this.render();
+  },
 
-/* === 1. To-Do === */
-.filters button { background: #95a5a6; }
-.filters button.active { background: #27ae60; }
-.task {
-  padding: 12px 0;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.task input[type="checkbox"] { transform: scale(1.2); }
-.done { text-decoration: line-through; color: #7f8c8d; }
+  remove(id) {
+    this.tasks = this.tasks.filter(t => t.id !== id);
+    this.render();
+  },
 
-/* === 2. Галерея === */
-.gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 15px;
-}
-.gallery img {
-  width: 100%;
-  height: 130px;
-  object-fit: cover;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.gallery img:hover { transform: scale(1.05); box-shadow: 0 8px 15px rgba(0,0,0,0.2); }
+  setFilter(type) {
+    this.filter = type;
+    document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[data-filter="${type}"]`).classList.add('active');
+    this.render();
+  },
 
-.modal {
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.95);
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-.modal img { max-width: 90%; max-height: 80vh; border-radius: 12px; }
-.caption { color: #fff; font-size: 1.5em; margin-top: 15px; text-align: center; }
-.close, .nav {
-  position: absolute;
-  color: white;
-  font-size: 3em;
-  cursor: pointer;
-  user-select: none;
-  font-weight: bold;
-}
-.close { top: 20px; right: 30px; }
-.prev { left: 20px; top: 50%; transform: translateY(-50%); }
-.next { right: 20px; top: 50%; transform: translateY(-50%); }
+  clearDone() {
+    this.tasks = this.tasks.filter(t => !t.done);
+    this.render();
+  },
 
-/* === 3. Форми === */
-.field-item {
-  padding: 16px;
-  margin: 12px 0;
-  background: #f8f9fa;
-  border: 2px dashed #3498db;
-  border-radius: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-}
+  render() {
+    const list = document.getElementById('todoList');
+    const count = document.getElementById('todoCount');
+    list.innerHTML = '';
 
-/* === 4. Таблиця === */
-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-th {
-  background: #3498db;
-  color: white;
-  cursor: pointer;
-  user-select: none;
-}
-th:hover { background: #2980b9; }
-td input { width: 100%; border: none; padding: 8px; font-size: 1em; }
-.pagination { margin-top: 15px; text-align: center; }
-.pagination button {
-  min-width: 40px;
-  background: #ecf0f1;
-  color: #2c3e50;
-}
-.pagination button.active { background: #27ae60; color: white; }
+    const filtered = this.tasks.filter(t => {
+      if (this.filter === 'active') return !t.done;
+      if (this.filter === 'done') return t.done;
+      return true;
+    });
 
-/* === 5. Dropdown === */
-.dropdown { position: relative; display: inline-block; }
-.dropbtn {
-  background: #9b59b6;
-  min-width: 240px;
-  text-align: left;
-  padding: 14px 20px;
-  border-radius: 8px;
-  font-size: 1.1em;
-}
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-top: 8px;
-  max-height: 280px;
-  overflow-y: auto;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-  z-index: 100;
-}
-.dropdown-item {
-  padding: 12px 18px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.dropdown-item:hover,
-.dropdown-item.focus {
-  background: #f1f1f1;
-}
-.show { display: block; }
+    filtered.forEach(t => {
+      const li = document.createElement('li');
+      li.className = 'task';
+      li.innerHTML = `
+        <input type="checkbox" ${t.done ? 'checked' : ''} onchange="Todo.toggle(${t.id})">
+        <span class="${t.done ? 'done' : ''}">${t.text}</span>
+        <button onclick="Todo.remove(${t.id})">X</button>
+      `;
+      list.appendChild(li);
+    });
+
+    count.textContent = this.tasks.filter(t => !t.done).length;
+  }
+};
+
+// === 2. Галерея ===
+const Gallery = {
+  images: [
+    { src: "https://picsum.photos/800/600?random=1", caption: "Гори" },
+    { src: "https://picsum.photos/800/600?random=2", caption: "Океан" },
+    { src: "https://picsum.photos/800/600?random=3", caption: "Ліс" },
+    { src: "https://picsum.photos/800/600?random=4", caption: "Місто" },
+    { src: "https://picsum.photos/800/600?random=5", caption: "Пустеля" }
+  ],
+  current: 0,
+
+  init() {
+    const container = document.getElementById('galleryThumbs');
+    this.images.forEach((img, i) => {
+      const div = document.createElement('div');
+      const thumb = new Image();
+      thumb.src = img.src.replace('800/600', '300/200');
+      thumb.onclick = () => this.open(i);
+      thumb.alt = img.caption;
+      div.appendChild(thumb);
+      container.appendChild(div);
+    });
+
+    document.querySelector('.close').onclick = () => this.close();
+    document.querySelector('.prev').onclick = () => this.nav(-1);
+    document.querySelector('.next').onclick = () => this.nav(1);
+    document.getElementById('modal').onclick = e => e.target.id === 'modal' && this.close();
+  },
+
+  open(i) {
+    this.current = i;
+    const modal = document.getElementById('modal');
+    modal.style.display = 'flex';
+    document.getElementById('modalImg').src = this.images[i].src;
+    document.getElementById('modalCaption').textContent = this.images[i].caption;
+  },
+
+  close() {
+    document.getElementById('modal').style.display = 'none';
+  },
+
+  nav(dir) {
+    this.current = (this.current + dir + this.images.length) % this.images.length;
+    this.open(this.current);
+  }
+};
+
+// === 3. Форми ===
+const FormBuilder = {
+  fields: [],
+
+  init() {
+    document.getElementById('addFieldBtn').onclick = () => this.add();
+    document.getElementById('exportJson').onclick = () => this.export();
+    this.render();
+  },
+
+  add() {
+    const type = document.getElementById('fieldType').value;
+    const label = document.getElementById('fieldLabel').value.trim() || 'Поле';
+    this.fields.push({ label, type, required: false });
+    document.getElementById('fieldLabel').value = '';
+    this.render();
+  },
+
+  remove(i) {
+    this.fields.splice(i, 1);
+    this.render();
+  },
+
+  move(i, dir) {
+    const ni = i + dir;
+    if (ni < 0 || ni >= this.fields.length) return;
+    [this.fields[i], this.fields[ni]] = [this.fields[ni], this.fields[i]];
+    this.render();
+  },
+
+  render() {
+    const container = document.getElementById('fieldsList');
+    container.innerHTML = '';
+    this.fields.forEach((f, i) => {
+      const div = document.createElement('div');
+      div.className = 'field-item';
+      div.innerHTML = `
+        <div>
+          <strong>${f.label}</strong> <small>(${f.type})</small>
+        </div>
+        <div>
+          <button onclick="FormBuilder.remove(${i})">Видалити</button>
+          <button onclick="FormBuilder.move(${i},-1)">Up</button>
+          <button onclick="FormBuilder.move(${i},1)">Down</button>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  },
+
+  export() {
+    const result = { title: "Моя форма", fields: this.fields };
+    const json = JSON.stringify(result, null, 2);
+    alert(json);
+    console.log(json);
+  }
+};
+
+// === 4. Таблиця ===
+const Table = {
+  data: [
+    ["Олена", 28, "Київ"],
+    ["Максим", 34, "Львів"],
+    ["Софія", 19, "Одеса"]
+  ],
+  page: 1,
+  perPage: 2,
+  sortCol: null,
+  sortAsc: true,
+  filter: '',
+
+  init() {
+    document.getElementById('addRowBtn').onclick = () => this.addRow();
+    document.getElementById('exportCsv').onclick = () => this.exportCSV();
+    document.getElementById('filterInput').oninput = e => this.filter(e.target.value);
+    document.querySelectorAll('th[data-col]').forEach(th => {
+      th.onclick = () => this.sort(+th.dataset.col);
+    });
+    this.render();
+  },
+
+  render() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+
+    let filtered = this.data.filter(row =>
+      row.some(cell => cell.toString().toLowerCase().includes(this.filter.toLowerCase()))
+    );
+
+    if (this.sortCol !== null) {
+      filtered.sort((a, b) => {
+        const x = a[this.sortCol], y = b[this.sortCol];
+        return (x > y ? 1 : -1) * (this.sortAsc ? 1 : -1);
+      });
+    }
+
+    const start = (this.page - 1) * this.perPage;
+    const pageData = filtered.slice(start, start + this.perPage);
+
+    pageData.forEach((row, i) => {
+      const tr = document.createElement('tr');
+      row.forEach((cell, j) => {
+        const td = document.createElement('td');
+        const input = document.createElement('input');
+        input.value = cell;
+        input.onchange = () => {
+          const globalIndex = this.data.indexOf(row);
+          this.data[globalIndex][j] = input.value;
+        };
+        td.appendChild(input);
+        tr.appendChild(td);
+      });
+      const del = document.createElement('td');
+      del.innerHTML = `<button onclick="Table.removeRow(${this.data.indexOf(row)})">X</button>`;
+      tr.appendChild(del);
+      tbody.appendChild(tr);
+    });
+
+    this.renderPagination(filtered.length);
+  },
+
+  renderPagination(total) {
+    const div = document.getElementById('pagination');
+    div.innerHTML = '';
+    const pages = Math.max(1, Math.ceil(total / this.perPage));
+    for (let i = 1; i <= pages; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      if (i === this.page) btn.classList.add('active');
+      btn.onclick = () => { this.page = i; this.render(); };
+      div.appendChild(btn);
+    }
+  },
+
+  addRow() {
+    this.data.push(["Новий", 0, "Місто"]);
+    this.render();
+  },
+
+  removeRow(i) {
+    this.data.splice(i, 1);
+    this.render();
+  },
+
+  sort(col) {
+    if (this.sortCol === col) this.sortAsc = !this.sortAsc;
+    else { this.sortCol = col; this.sortAsc = true; }
+    this.render();
+  },
+
+  filter(val) {
+    this.filter = val;
+    this.page = 1;
+    this.render();
+  },
+
+  exportCSV() {
+    const csv = this.data.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'table.csv';
+    a.click();
+  }
+};
+
+// === 5. Dropdown ===
+const Dropdown = {
+  options: ["Україна", "Польща", "Німеччина", "Франція", "Іспанія", "Італія", "Чехія", "Португалія", "Греція"],
+  focused: -1,
+
+  init() {
+    const btn = document.getElementById('dropBtn');
+    const menu = document.getElementById('dropdownMenu');
+
+    this.renderMenu();
+
+    btn.onclick = () => {
+      const isOpen = menu.classList.toggle('show');
+      btn.setAttribute('aria-expanded', isOpen);
+      if (isOpen) this.focused = 0, this.highlight(0);
+    };
+
+    document.addEventListener('click', e => {
+      if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove('show');
+        btn.setAttribute('aria-expanded', false);
+      }
+    });
+
+    // Клавіатура
+    btn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        btn.click();
+      }
+    });
+
+    menu.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { menu.classList.remove('show'); btn.focus(); }
+      if (e.key === 'ArrowDown') { e.preventDefault(); this.focused = (this.focused + 1) % this.options.length; this.highlight(this.focused); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); this.focused = (this.focused - 1 + this.options.length) % this.options.length; this.highlight(this.focused); }
+      if (e.key === 'Enter') { e.preventDefault(); this.select(this.options[this.focused]); }
+    });
+
+    // Пошук
+    let search = '';
+    document.addEventListener('keydown', e => {
+      if (!menu.classList.contains('show')) return;
+      if (/[a-zа-яё]/i.test(e.key)) {
+        search += e.key.toLowerCase();
+        setTimeout(() => search = search.slice(1), 800);
+        const idx = this.options.findIndex(opt => opt.toLowerCase().startsWith(search));
+        if (idx !== -1) { this.focused = idx; this.highlight(idx); }
+      }
+    });
+  },
+
+  renderMenu() {
+    const menu = document.getElementById('dropdownMenu');
+    menu.innerHTML = '';
+    this.options.forEach((opt, i) => {
+      const div = document.createElement('div');
+      div.className = 'dropdown-item';
+      div.textContent = opt;
+      div.tabIndex = -1;
+      div.onclick = () => this.select(opt);
+      menu.appendChild(div);
+    });
+  },
+
+  highlight(i) {
+    document.querySelectorAll('.dropdown-item').forEach((el, idx) => {
+      el.classList.toggle('focus', idx === i);
+      if (idx === i) el.scrollIntoView({ block: 'nearest' });
+    });
+  },
+
+  select(val) {
+    document.getElementById('dropBtn').textContent = val + ' Down Arrow';
+    document.getElementById('selectedCountry').textContent = val;
+    document.getElementById('dropdownMenu').classList.remove('show');
+    document.getElementById('dropBtn').setAttribute('aria-expanded', false);
+  }
+};
+
+// === ЗАПУСК ===
+window.onload = () => {
+  Todo.init();
+  Gallery.init();
+  FormBuilder.init();
+  Table.init();
+  Dropdown.init();
+
+  // Escape для галереї
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.getElementById('modal').style.display === 'flex') {
+      Gallery.close();
+    }
+  });
+};
